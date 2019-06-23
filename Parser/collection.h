@@ -5,34 +5,70 @@
 #ifndef PSL_COLLECTION_H
 #define PSL_COLLECTION_H
 
-template < typename T, class alloc = std::allocator<T> >
+template<typename T, class alloc = std::allocator<T> >
 class collection {
 public:
-    typedef T* pointer;
-    typedef T& reference;
+    typedef T *pointer;
+    typedef T &reference;
     typedef size_t size_type;
+
+    class index_out_of_bounds : public std::exception {
+    private:
+        size_type i, length;
+    public:
+        const char* what() const throw();
+
+        index_out_of_bounds(size_type i, size_type length);
+    };
+
+    class iterator {
+    private:
+        size_type i;
+        collection* outer;
+    public:
+        iterator(size_type i, collection* outer);
+
+        bool operator<(const iterator &rhs) const;
+
+        bool operator>(const iterator &rhs) const;
+
+        bool operator<=(const iterator &rhs) const;
+
+        bool operator>=(const iterator &rhs) const;
+
+        bool operator==(const iterator &rhs) const;
+
+        bool operator!=(const iterator &rhs) const;
+
+        iterator operator+ (int i);
+        iterator operator- (int i);
+        iterator operator++ ();
+        iterator operator-- ();
+
+        T &operator*();
+    };
+
 private:
     alloc allocator;
-    T** element_storage;
-    size_type length = 0;
+    T **element_storage;
+    size_type length;
 public:
-    collection& add(T value) {
-        T* value_ptr = allocator.allocate(1);
-        *value_ptr = value;
+    collection();
 
-        T** save = new T*[length];
-        for (size_type i = 0; i < length; i++) save[i] = element_storage[i];
+    size_type size();
 
-        element_storage = new T*[length + 1];
-        for (size_type i = 0; i < length; i++) element_storage[i] = save[i];
+    collection &add(T value);
+    collection &add_all(collection another);
 
-        delete[] save;
+    reference get(size_type i);
+    reference set(size_type i, T value);
 
-        element_storage[length + 1] = value_ptr;
-        length++;
+    reference operator[](size_type i);
 
-        return *this;
-    }
+    collection operator+(T element);
+
+    iterator begin();
+    iterator end();
 };
 
 
