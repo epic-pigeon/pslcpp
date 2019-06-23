@@ -79,6 +79,20 @@ typename collection<T, alloc>::iterator collection<T, alloc>::end() {
 }
 
 template<typename T, class alloc>
+collection<T, alloc>::collection(collection::size_type length, T (*func)(int)) : collection() {
+    for (size_type i = 0; i < length; i++) {
+        add(func(i));
+    }
+}
+
+template<typename T, class alloc>
+collection<T, alloc>::collection(collection::size_type length, T values) : collection() {
+    for (size_type i = 0; i < length; i++) {
+        add(values);
+    }
+}
+
+template<typename T, class alloc>
 const char *collection<T, alloc>::index_out_of_bounds::what() const throw() {
     std::stringstream stringstream;
     stringstream << "Array length: " << length << ", required index: " << i;

@@ -54,6 +54,8 @@ private:
     size_type length;
 public:
     collection();
+    collection(size_type length, T values);
+    collection(size_type length, T (*func)(int));
 
     size_type size();
 
